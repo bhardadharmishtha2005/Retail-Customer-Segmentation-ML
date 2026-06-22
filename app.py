@@ -62,40 +62,17 @@ if module_selection == "🎯 Product Recommendation Engine":
     st.write("Analyze transactional relationships between SKUs across thousands of checkouts to identify hyper-relevant cross-selling opportunities.")
     
     if similarity_matrix is None or product_list is None:
-        st.info("💡 **Welcome to the Recommendation Engine Preview**")
-        st.warning("⚠️ Files (`product_similarity_matrix.pkl` / `product_list.pkl`) are missing from GitHub. Below is a mock preview of what your evaluators will see once uploaded:")
-        
-        # MOCK UI FOR PREVIEW & VALIDATION ONLY
-        mock_products = ["WHITE HANGING HEART T-LIGHT HOLDER", "REGENCY CAKESTAND 3 TIER", "PARTY BUNTING", "JUMBO BAG RED RETROSPOT", "ASSORTED COLOUR BIRD ORNAMENT"]
-        selected_product = st.selectbox("Type or Select a Target Product Name:", mock_products)
-        
-        if st.button("Generate Recommendations", type="primary"):
-            # LIVE PRODUCTION MODE: Fetch the top 5 directly from our compressed dictionary
-            top_10_recommendations = similarity_matrix.get(selected_product, [])
-            top_5_recommendations = top_10_recommendations[:5]
-            
-            st.markdown("### ✨ Top 5 Cross-Sell Recommendations:")
-            cols = st.columns(5)
-            for col_idx, (rec_idx, score) in enumerate(top_5_recommendations):
-                with cols[col_idx]:
-                    st.markdown(f"""
-                    <div class="recommendation-card">
-                        <p style='font-size:24px;margin:0;'>📦</p>
-                        <h4 style='font-size:14px;color:#e6edf3;height:50px;overflow:hidden;'>{product_list[rec_idx]}</h4>
-                        <span style='background-color:#1f6feb;color:white;padding:3px 8px;border-radius:12px;font-size:12px;'>Match: {score:.1%}</span>
-                    </div>
-                    """, unsafe_allow_html=True)
+        st.warning("⚠️ Recommendation system files (`product_similarity_matrix.pkl` / `product_list.pkl`) not detected in your repository yet.")
     else:
-        # LIVE PRODUCTION MODE
         selected_product = st.selectbox("Type or Select a Target Product Name:", product_list)
+        
         if st.button("Generate Recommendations", type="primary"):
-            
-            # 🔥 FIX: Read directly from our dictionary using the text product name as the key!
+            # Fetch directly from our dictionary using the product string key
             top_10_recommendations = similarity_matrix.get(selected_product, [])
             top_5_recommendations = top_10_recommendations[:5]
             
             if not top_5_recommendations:
-                st.info("No explicit high-confidence cross-sell matches calculated for this specific item yet.")
+                st.info("No explicit cross-sell matches calculated for this item.")
             else:
                 st.markdown("### ✨ Top 5 Cross-Sell Recommendations:")
                 cols = st.columns(5)
@@ -117,26 +94,24 @@ elif module_selection == "👥 RFM Customer Segmentation":
     st.markdown("### `K-Means Mathematical Boundary Profiler`")
     st.write("Process algorithmic cluster assignments by transforming behavioral signals (Recency, Frequency, Monetary) against baseline metrics.")
     
-    # Clean split input panels
     with st.container():
         st.markdown("#### 📥 Live Operational Inputs")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            recency = st.number_input("Recency (Days Since Last Order)", min_value=0, max_value=365, value=30, help="Fewer days mean higher recent engagement.")
+            recency = st.number_input("Recency (Days Since Last Order)", min_value=0, max_value=365, value=30)
         with col2:
-            frequency = st.number_input("Frequency (Total Transactions)", min_value=1, max_value=500, value=5, help="Total orders placed by this account.")
+            frequency = st.number_input("Frequency (Total Transactions)", min_value=1, max_value=500, value=5)
         with col3:
-            monetary = st.number_input("Monetary Value (Total Spend $)", min_value=0.1, max_value=100000.0, value=250.0, help="Gross dollar revenue from this client.")
+            monetary = st.number_input("Monetary Value (Total Spend $)", min_value=0.1, max_value=100000.0, value=250.0)
         with col4:
-            invoice_variety = st.number_input("Invoice Variety (Unique SKU Count)", min_value=1, max_value=100, value=4, help="Breadth of inventory variance purchased.")
+            invoice_variety = st.number_input("Invoice Variety (Unique SKU Count)", min_value=1, max_value=100, value=4)
 
     st.markdown("---")
     
     if st.button("Execute Cluster Assignment", type="primary"):
         if model is None or scaler is None:
-            st.error("❌ Pipeline models not found on GitHub repository. Please commit 'final_kmeans_retail_model.pkl' and 'retail_standard_scaler.pkl'.")
+            st.error("❌ Pipeline models not found on GitHub repository.")
         else:
-            # Replicate pipeline scaling preprocessing logic
             log_q = np.log1p(frequency)
             log_p = np.log1p(monetary / max(1, frequency))
             log_a = np.log1p(monetary)
@@ -147,10 +122,8 @@ elif module_selection == "👥 RFM Customer Segmentation":
             feature_names = ['Log_Quantity', 'Log_UnitPrice', 'Log_TotalAmount', 'InvoiceVarietyCount']
             final_scaled_df = pd.DataFrame(scaled_features, columns=feature_names)
             
-            # Predict
             cluster_id = model.predict(final_scaled_df)[0]
             
-            # Premium Visual UI Cards mapping based on cluster identification output
             cluster_mapping = {
                 0: ("🔴 Churn Risk / Low Value", "error", "Low activity and stale log interactions. High risk of complete churn.", "Deploy win-back automated email coupons and clear excess old stock items to lower loss thresholds."),
                 1: ("🟡 Casual/Occasional Retail Shopper", "warning", "Inconsistent ordering behaviors. Standard low-frequency baskets.", "Introduce product loyalty tier points systems and showcase product recommendations to upsell order totals."),
@@ -161,20 +134,16 @@ elif module_selection == "👥 RFM Customer Segmentation":
             title, alert_type, brief, strategy = cluster_mapping.get(cluster_id, (f"Cluster {cluster_id}", "info", "Standard custom split block.", "N/A"))
             
             st.markdown("### 📊 Engine Performance Diagnostics")
-            
-            # Display Real-Time Metrics Row
             m_col1, m_col2, m_col3 = st.columns(3)
             m_col1.metric("Assigned Cohort ID", f"Cluster {cluster_id}")
             m_col2.metric("Profile Spend Density", f"${monetary:,.2f}")
             m_col3.metric("Basket Breadth", f"{invoice_variety} SKUs")
             
-            # Display targeted alert block
             if alert_type == "error": st.error(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
             elif alert_type == "warning": st.warning(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
             elif alert_type == "success": st.success(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
             else: st.info(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
             
-            # Operational Business Blueprint container
             st.markdown(f"""
             <div class="metric-card">
                 <h4 style='color:#4A90E2;margin-top:0;'>🚀 Recommended Institutional Strategy:</h4>
