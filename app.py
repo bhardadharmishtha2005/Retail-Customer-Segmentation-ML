@@ -70,16 +70,19 @@ if module_selection == "🎯 Product Recommendation Engine":
         selected_product = st.selectbox("Type or Select a Target Product Name:", mock_products)
         
         if st.button("Generate Recommendations", type="primary"):
+            # LIVE PRODUCTION MODE: Fetch the top 5 directly from our compressed dictionary
+            top_10_recommendations = similarity_matrix.get(selected_product, [])
+            top_5_recommendations = top_10_recommendations[:5]
+            
             st.markdown("### ✨ Top 5 Cross-Sell Recommendations:")
             cols = st.columns(5)
-            mock_recs = [("JAM MAKING SET WITH JARS", "94.2%"), ("RED RETROSPOT MINI CASES", "88.7%"), ("HEART OF WICKER LARGE", "85.1%"), ("SET OF 3 CAKE TINS SKULLS", "81.4%"), ("WOODEN PICTURE FRAME WHITE", "79.0%")]
-            for idx, (prod, score) in enumerate(mock_recs):
-                with cols[idx]:
+            for col_idx, (rec_idx, score) in enumerate(top_5_recommendations):
+                with cols[col_idx]:
                     st.markdown(f"""
                     <div class="recommendation-card">
                         <p style='font-size:24px;margin:0;'>📦</p>
-                        <h4 style='font-size:14px;color:#e6edf3;height:50px;overflow:hidden;'>{prod}</h4>
-                        <span style='background-color:#1f6feb;color:white;padding:3px 8px;border-radius:12px;font-size:12px;'>Match: {score}</span>
+                        <h4 style='font-size:14px;color:#e6edf3;height:50px;overflow:hidden;'>{product_list[rec_idx]}</h4>
+                        <span style='background-color:#1f6feb;color:white;padding:3px 8px;border-radius:12px;font-size:12px;'>Match: {score:.1%}</span>
                     </div>
                     """, unsafe_allow_html=True)
     else:
