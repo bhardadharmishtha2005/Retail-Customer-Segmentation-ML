@@ -54,7 +54,7 @@ def load_assets():
 
 model, scaler, similarity_matrix, product_list = load_assets()
 
-page = st.sidebar.radio("Navigate Workspace:", ["🏠 Home Overview", "👥 Customer Clustering", "🎯 Product Recommendations"])
+page = st.sidebar.radio("Navigate Workspace:", ["🏠 Home Overview", "👥 Customer Clustering", "🎯 Item Recommendations"])
 
 # ==============================================================================
 # 🏠 PAGE 1: HOME OVERVIEW (UPGRADED)
