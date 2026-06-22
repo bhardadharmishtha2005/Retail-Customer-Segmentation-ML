@@ -46,12 +46,7 @@ def load_assets():
 
 model, scaler, similarity_matrix, product_list = load_assets()
 
-# --- SIDEBAR NAVIGATION ---
-st.sidebar.image("https://img.icons8.com/fluent/96/000000/dashboard.png", width=70)
-st.sidebar.title("Control Center")
-st.sidebar.markdown("*AI-Driven Retail Operations*")
-st.sidebar.markdown("---")
-page = st.sidebar.radio("Navigate Workspace:", ["🏠 Home Overview", "👥 Customer Clustering", "🎯 Product Recommendations"])
+page = st.sidebar.radio("Navigate Workspace:", ["🏠 Home Overview", "🎯 Product Recommendations", "👥 Customer Clustering"])
 
 # ==============================================================================
 # 🏠 PAGE 1: HOME OVERVIEW
