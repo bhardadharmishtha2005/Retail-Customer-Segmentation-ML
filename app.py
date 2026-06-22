@@ -89,22 +89,25 @@ if module_selection == "🎯 Product Recommendation Engine":
         # LIVE PRODUCTION MODE
         selected_product = st.selectbox("Type or Select a Target Product Name:", product_list)
         if st.button("Generate Recommendations", type="primary"):
-            idx = list(product_list).index(selected_product)
-            similarity_scores = list(enumerate(similarity_matrix[idx]))
-            similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
-            top_5_recommendations = similarity_scores[1:6]
             
-            st.markdown("### ✨ Top 5 Cross-Sell Recommendations:")
-            cols = st.columns(5)
-            for col_idx, (rec_idx, score) in enumerate(top_5_recommendations):
-                with cols[col_idx]:
-                    st.markdown(f"""
-                    <div class="recommendation-card">
-                        <p style='font-size:24px;margin:0;'>📦</p>
-                        <h4 style='font-size:14px;color:#e6edf3;height:50px;overflow:hidden;'>{product_list[rec_idx]}</h4>
-                        <span style='background-color:#1f6feb;color:white;padding:3px 8px;border-radius:12px;font-size:12px;'>Match: {score:.1%}</span>
-                    </div>
-                    """, unsafe_allow_html=True)
+            # 🔥 FIX: Read directly from our dictionary using the text product name as the key!
+            top_10_recommendations = similarity_matrix.get(selected_product, [])
+            top_5_recommendations = top_10_recommendations[:5]
+            
+            if not top_5_recommendations:
+                st.info("No explicit high-confidence cross-sell matches calculated for this specific item yet.")
+            else:
+                st.markdown("### ✨ Top 5 Cross-Sell Recommendations:")
+                cols = st.columns(5)
+                for col_idx, (rec_idx, score) in enumerate(top_5_recommendations):
+                    with cols[col_idx]:
+                        st.markdown(f"""
+                        <div class="recommendation-card">
+                            <p style='font-size:24px;margin:0;'>📦</p>
+                            <h4 style='font-size:14px;color:#e6edf3;height:50px;overflow:hidden;'>{product_list[rec_idx]}</h4>
+                            <span style='background-color:#1f6feb;color:white;padding:3px 8px;border-radius:12px;font-size:12px;'>Match: {score:.1%}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
 
 # ==============================================================================
 # 👥 MODULE 2: RFM CUSTOMER SEGMENTATION
