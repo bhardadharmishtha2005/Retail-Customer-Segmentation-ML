@@ -172,7 +172,7 @@ elif page == "👥 Customer Clustering":
 # ==============================================================================
 # 🎯 PAGE 3: PRODUCT RECOMMENDATIONS
 # ==============================================================================
-elif page == "🎯 Product Recommendations":
+elif page == "🎯 Item Recommendations":
     st.title("🎯 Item Recommendation Engine")
     st.markdown("### `Item-Based Collaborative Filtering Model`")
     st.write("Scan product inventory pairings to generate optimized cross-selling predictions instantly.")
