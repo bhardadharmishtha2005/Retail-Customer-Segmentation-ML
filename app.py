@@ -3,20 +3,20 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# Set page layout to wide with a premium title icon
+# Set page layout configuration to wide with a premium analytics icon
 st.set_page_config(page_title="Enterprise Retail Intelligence Suite", page_icon="📈", layout="wide")
 
-# Custom CSS styling to make elements look polished and professional
+# Custom UI Styling to make elements look modern and professional
 st.markdown("""
     <style>
-    .metric-card {
+    .metric-box {
         background-color: #1e222b;
-        padding: 15px;
+        padding: 20px;
         border-radius: 10px;
         border-left: 5px solid #4A90E2;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
-    .recommendation-card {
+    .card-item {
         background-color: #0e1117;
         padding: 20px;
         border-radius: 12px;
@@ -27,9 +27,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- LOAD ASSETS Safely ---
+# --- CACHE DATA AND MODELS ASSETS ---
 @st.cache_resource
-def load_models():
+def load_assets():
     try:
         model = joblib.load('final_kmeans_retail_model.pkl')
         scaler = joblib.load('retail_standard_scaler.pkl')
@@ -44,74 +44,57 @@ def load_models():
         
     return model, scaler, similarity_matrix, product_list
 
-model, scaler, similarity_matrix, product_list = load_models()
+model, scaler, similarity_matrix, product_list = load_assets()
 
-# --- SIDEBAR DESIGN ---
-st.sidebar.image("https://img.icons8.com/fluent/96/000000/dashboard.png", width=80)
+# --- SIDEBAR NAVIGATION ---
+st.sidebar.image("https://img.icons8.com/fluent/96/000000/dashboard.png", width=70)
 st.sidebar.title("Control Center")
 st.sidebar.markdown("*AI-Driven Retail Operations*")
 st.sidebar.markdown("---")
-module_selection = st.sidebar.radio("Select Analytics Workspace:", ["🎯 Product Recommendation Engine", "👥 RFM Customer Segmentation"])
+page = st.sidebar.radio("Navigate Workspace:", ["🏠 Home Overview", "👥 Customer Clustering", "🎯 Product Recommendations"])
 
 # ==============================================================================
-# 🎯 MODULE 1: PRODUCT RECOMMENDATION ENGINE
+# 🏠 PAGE 1: HOME OVERVIEW
 # ==============================================================================
-if module_selection == "🎯 Product Recommendation Engine":
-    st.title("🎯 Product Recommendation Engine")
-    st.markdown("### `Item-Based Collaborative Filtering System`")
-    st.write("Analyze transactional relationships between SKUs across thousands of checkouts to identify hyper-relevant cross-selling opportunities.")
+if page == "🏠 Home Overview":
+    st.title("🏠 Enterprise Retail Intelligence Suite")
+    st.markdown("### `System Infrastructure Overview`")
+    st.write("Welcome to the AI-driven retail command center. This system integrates unsupervised machine learning structures with real-time transactional collaborative pipelines.")
     
-    if similarity_matrix is None or product_list is None:
-        st.warning("⚠️ Recommendation system files (`product_similarity_matrix.pkl` / `product_list.pkl`) not detected in your repository yet.")
-    else:
-        selected_product = st.selectbox("Type or Select a Target Product Name:", product_list)
-        
-        if st.button("Generate Recommendations", type="primary"):
-            # Fetch directly from our dictionary using the product string key
-            top_10_recommendations = similarity_matrix.get(selected_product, [])
-            top_5_recommendations = top_10_recommendations[:5]
-            
-            if not top_5_recommendations:
-                st.info("No explicit cross-sell matches calculated for this item.")
-            else:
-                st.markdown("### ✨ Top 5 Cross-Sell Recommendations:")
-                cols = st.columns(5)
-                for col_idx, (rec_idx, score) in enumerate(top_5_recommendations):
-                    with cols[col_idx]:
-                        st.markdown(f"""
-                        <div class="recommendation-card">
-                            <p style='font-size:24px;margin:0;'>📦</p>
-                            <h4 style='font-size:14px;color:#e6edf3;height:50px;overflow:hidden;'>{product_list[rec_idx]}</h4>
-                            <span style='background-color:#1f6feb;color:white;padding:3px 8px;border-radius:12px;font-size:12px;'>Match: {score:.1%}</span>
-                        </div>
-                        """, unsafe_allow_html=True)
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info("#### 👥 RFM Segmentation Module\nProcesses structural behavioral signals (Recency, Frequency, Monetary) through mathematical K-Means boundaries to classify distinct customer personas.")
+    with col2:
+        st.success("#### 🎯 Product Recommendation Engine\nUtilizes item-based Collaborative Filtering matrices and Cosine Similarity equations to generate automated cross-sell strategies.")
 
 # ==============================================================================
-# 👥 MODULE 2: RFM CUSTOMER SEGMENTATION
+# 👥 PAGE 2: CUSTOMER CLUSTERING
 # ==============================================================================
-elif module_selection == "👥 RFM Customer Segmentation":
+elif page == "👥 Customer Clustering":
     st.title("👥 Advanced RFM Customer Segmentation")
     st.markdown("### `K-Means Mathematical Boundary Profiler`")
-    st.write("Process algorithmic cluster assignments by transforming behavioral signals (Recency, Frequency, Monetary) against baseline metrics.")
+    st.write("Input structural operational behaviors below to map target account metrics into actionable enterprise cohorts.")
     
     with st.container():
         st.markdown("#### 📥 Live Operational Inputs")
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
+        c1, c2, c3 = st.columns(3)
+        with c1:
             recency = st.number_input("Recency (Days Since Last Order)", min_value=0, max_value=365, value=30)
-        with col2:
+        with c2:
             frequency = st.number_input("Frequency (Total Transactions)", min_value=1, max_value=500, value=5)
-        with col3:
+        with c3:
             monetary = st.number_input("Monetary Value (Total Spend $)", min_value=0.1, max_value=100000.0, value=250.0)
-        with col4:
-            invoice_variety = st.number_input("Invoice Variety (Unique SKU Count)", min_value=1, max_value=100, value=4)
+            
+    # Hardcoded/fallback index for structural array dimensioning
+    invoice_variety = 4 
 
     st.markdown("---")
-    
-    if st.button("Execute Cluster Assignment", type="primary"):
+    if st.button("Predict Segment Profile", type="primary"):
         if model is None or scaler is None:
-            st.error("❌ Pipeline models not found on GitHub repository.")
+            st.error("❌ Model serialization files (`final_kmeans_retail_model.pkl` / `retail_standard_scaler.pkl`) not detected in repository.")
         else:
+            # Replicate pipeline scaling preprocessing transformations
             log_q = np.log1p(frequency)
             log_p = np.log1p(monetary / max(1, frequency))
             log_a = np.log1p(monetary)
@@ -124,29 +107,62 @@ elif module_selection == "👥 RFM Customer Segmentation":
             
             cluster_id = model.predict(final_scaled_df)[0]
             
+            # Premium Visual Profile Mapping
             cluster_mapping = {
-                0: ("🔴 Churn Risk / Low Value", "error", "Low activity and stale log interactions. High risk of complete churn.", "Deploy win-back automated email coupons and clear excess old stock items to lower loss thresholds."),
-                1: ("🟡 Casual/Occasional Retail Shopper", "warning", "Inconsistent ordering behaviors. Standard low-frequency baskets.", "Introduce product loyalty tier points systems and showcase product recommendations to upsell order totals."),
-                2: ("🟢 Core Regular Value Client", "info", "Highly structured order cycles, active account health, predictable margins.", "Provide dedicated early access to product launches and maintain robust baseline inventory levels to satisfy demand."),
-                3: ("💎 Premium Enterprise Wholesale", "success", "Massive purchase concentrations, significant scaling totals, highly recurring baskets.", "Assign dedicated accounts managers, offer bespoke bulk wholesale pricing agreements, and provide tier-1 delivery logistics priority.")
+                0: ("🔴 Churn Risk Account", "error", "Low order activity with trailing operational dates.", "Deploy win-back automated marketing emails and clear slow-moving inventory items."),
+                1: ("🟡 Casual Occasional Shopper", "warning", "Standard retail consumer baseline with erratic transactional frequencies.", "Introduce tiered loyalty program milestones and push targeted notifications."),
+                2: ("🟢 Core Regular Value Client", "info", "Predictable baseline order behaviors, high margin consistency, solid account health.", "Provide priority early access to inventory drops and dedicated support structures."),
+                3: ("💎 Premium Enterprise Wholesale", "success", "Massive transaction sizes, scaling wholesale distribution totals.", "Assign dedicated account contract management and premium logistical delivery priority.")
             }
             
-            title, alert_type, brief, strategy = cluster_mapping.get(cluster_id, (f"Cluster {cluster_id}", "info", "Standard custom split block.", "N/A"))
+            title, alert_type, brief, strategy = cluster_mapping.get(cluster_id, (f"Cluster {cluster_id}", "info", "Identified custom split sequence.", "N/A"))
             
             st.markdown("### 📊 Engine Performance Diagnostics")
             m_col1, m_col2, m_col3 = st.columns(3)
             m_col1.metric("Assigned Cohort ID", f"Cluster {cluster_id}")
             m_col2.metric("Profile Spend Density", f"${monetary:,.2f}")
-            m_col3.metric("Basket Breadth", f"{invoice_variety} SKUs")
+            m_col3.metric("Calculated Baseline Group", title)
             
-            if alert_type == "error": st.error(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
-            elif alert_type == "warning": st.warning(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
-            elif alert_type == "success": st.success(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
-            else: st.info(f"#### **Target Segment Profile: {title}**\n\n**Behavioral Overview:** {brief}")
+            if alert_type == "error": st.error(f"#### **Profile Target: {title}**\n\n**Behavioral Baseline Summary:** {brief}")
+            elif alert_type == "warning": st.warning(f"#### **Profile Target: {title}**\n\n**Behavioral Baseline Summary:** {brief}")
+            elif alert_type == "success": st.success(f"#### **Profile Target: {title}**\n\n**Behavioral Baseline Summary:** {brief}")
+            else: st.info(f"#### **Profile Target: {title}**\n\n**Behavioral Baseline Summary:** {brief}")
             
             st.markdown(f"""
-            <div class="metric-card">
-                <h4 style='color:#4A90E2;margin-top:0;'>🚀 Recommended Institutional Strategy:</h4>
+            <div class="metric-box">
+                <h4 style='color:#4A90E2;margin-top:0;'>🚀 Strategic Operation Guideline:</h4>
                 <p style='color:#c9d1d9;font-size:15px;margin-bottom:0;'>{strategy}</p>
             </div>
             """, unsafe_allow_html=True)
+
+# ==============================================================================
+# 🎯 PAGE 3: PRODUCT RECOMMENDATIONS
+# ==============================================================================
+elif page == "🎯 Product Recommendations":
+    st.title("🎯 Item Recommendation Engine")
+    st.markdown("### `Item-Based Collaborative Filtering Model`")
+    st.write("Scan product inventory pairings to generate optimized cross-selling predictions instantly.")
+    
+    if similarity_matrix is None or product_list is None:
+        st.warning("⚠️ Recommendation asset files (`product_similarity_matrix.pkl` / `product_list.pkl`) are missing from GitHub.")
+    else:
+        selected_product = st.selectbox("Type or Select a Target Product Name:", product_list)
+        
+        if st.button("Generate Recommendations", type="primary"):
+            top_10_recommendations = similarity_matrix.get(selected_product, [])
+            top_5_recommendations = top_10_recommendations[:5]
+            
+            if not top_5_recommendations:
+                st.info("No definitive product pairings detected for this selection.")
+            else:
+                st.markdown("### ✨ Top 5 Optimized Cross-Sell Recommendations:")
+                cols = st.columns(5)
+                for col_idx, (rec_idx, score) in enumerate(top_5_recommendations):
+                    with cols[col_idx]:
+                        st.markdown(f"""
+                        <div class="card-item">
+                            <p style='font-size:26px;margin:0;'>📦</p>
+                            <h5 style='font-size:13px;color:#e6edf3;height:55px;overflow:hidden;'>{product_list[rec_idx]}</h5>
+                            <span style='background-color:#1f6feb;color:white;padding:4px 10px;border-radius:12px;font-size:11px;'>Match: {score:.1%}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
